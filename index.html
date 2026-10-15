@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEFL iBT Reading Practice Test 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- ICONS ---
+    const Clock = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    );
+    const ChevronRight = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    );
+    const ChevronLeft = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    );
+    const List = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+      </svg>
+    );
+    const CheckCircle = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    );
+    const Play = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    );
+    const Pause = ({size, className}) => (
+      <svg className={className} width={size} height={size} fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+      </svg>
+    );
+
+    // --- DATA DEFINITION ---
+    const module1Data = {
+      id: 1,
+      timeLimit: 15 * 60,
+      questions: [
+        { type: 'cloze', id: 'm1_cloze', qNums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+        { type: 'mc', id: 'm1_11', qNum: 11, group: 'notice' },
+        { type: 'mc', id: 'm1_12', qNum: 12, group: 'notice' },
+        { type: 'mc', id: 'm1_13', qNum: 13, group: 'social' },
+        { type: 'mc', id: 'm1_14', qNum: 14, group: 'social' },
+        { type: 'mc', id: 'm1_15', qNum: 15, group: 'social' },
+        { type: 'mc', id: 'm1_16', qNum: 16, group: 'academic' },
+        { type: 'mc', id: 'm1_17', qNum: 17, group: 'academic' },
+        { type: 'mc', id: 'm1_18', qNum: 18, group: 'academic' },
+        { type: 'mc', id: 'm1_19', qNum: 19, group: 'academic' },
+        { type: 'mc', id: 'm1_20', qNum: 20, group: 'academic' },
+      ],
+      mcData: {
+        m1_11: { text: "What type of business issued the notice?", options: ["(A) An Internet provider", "(B) A computer company", "(C) A paper company", "(D) A bank"], correct: 3 },
+        m1_12: { text: "How can customers enroll in paperless billing?", options: ["(A) By visiting a Municipal Charter office", "(B) By accessing the Municipal Charter website", "(C) By using the Municipal Charter app", "(D) By calling a Municipal Charter customer service representative"], correct: 2 },
+        m1_13: { text: "What is the main purpose of the post?", options: ["(A) To explain the benefits of organic farming", "(B) To describe the variety of products available at the farmer's market", "(C) To compare different farmer's markets in the area", "(D) To offer advice on starting a stall at the farmer's market"], correct: 1 },
+        m1_14: { text: "What reason is given for the popularity of the Thompson family's stall?", options: ["(A) They offer cooking tips and recipes.", "(B) They offer the lowest prices at the market.", "(C) They provide friendly service and excellent products.", "(D) They have a beautiful and well-decorated stall."], correct: 2 },
+        m1_15: { text: "Why do customers go to the bakery stall early?", options: ["(A) To get the free samples given in mornings", "(B) To get freshly baked bread and pastries before they are gone", "(C) To meet the famous baker", "(D) To take advantage of early morning discounts"], correct: 1 },
+        m1_16: { text: "What is the passage mainly about?", options: ["(A) Stages of early childhood development", "(B) Research on animal cognition", "(C) Differences between apes, elephants, and dolphins", "(D) Recent experiments on fish"], correct: 1 },
+        m1_17: { text: "The word \"milestone\" in the first sentence is closest in meaning to", options: ["(A) accomplishment", "(B) distance", "(C) weight", "(D) discovery"], correct: 0 },
+        m1_18: { text: "Why did scientists put colored marks on animals' bodies?", options: ["(A) It made it possible to track the animals' movements.", "(B) It helped them determine whether the animals recognized themselves.", "(C) It made it easier to tell the animals apart.", "(D) It showed whether some animals can detect color differences."], correct: 1 },
+        m1_19: { text: "According to the passage, all of the following are true about elephants EXCEPT:", options: ["(A) They can recognize themselves in mirrors.", "(B) They are highly intelligent animals.", "(C) They possess qualities in common with apes.", "(D) They understand certain signs from other animals."], correct: 3 },
+        m1_20: { text: "Why does the author mention cleaner fish?", options: ["(A) To suggest that a wide range of animals may possess self-awareness", "(B) To imply that ocean animals are highly intelligent", "(C) To demonstrate a flaw in a recent experiment", "(D) To provide an example of an animal that does not recognize itself"], correct: 0 },
+      }
+    };
+
+    const module2Data = {
+      id: 2,
+      timeLimit: 15 * 60,
+      questions: [
+        { type: 'cloze', id: 'm2_cloze', qNums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+        { type: 'mc', id: 'm2_11', qNum: 11, group: 'email1' },
+        { type: 'mc', id: 'm2_12', qNum: 12, group: 'email1' },
+        { type: 'mc', id: 'm2_13', qNum: 13, group: 'email2' },
+        { type: 'mc', id: 'm2_14', qNum: 14, group: 'email2' },
+        { type: 'mc', id: 'm2_15', qNum: 15, group: 'email2' },
+        { type: 'mc', id: 'm2_16', qNum: 16, group: 'academic' },
+        { type: 'mc', id: 'm2_17', qNum: 17, group: 'academic' },
+        { type: 'mc', id: 'm2_18', qNum: 18, group: 'academic' },
+        { type: 'mc', id: 'm2_19', qNum: 19, group: 'academic' },
+        { type: 'mc', id: 'm2_20', qNum: 20, group: 'academic' },
+      ],
+      mcData: {
+        m2_11: { text: "When is the date of the art workshop?", options: ["(A) September 10th", "(B) September 12th", "(C) September 20th", "(D) September 30th"], correct: 2 },
+        m2_12: { text: "What should Ms. Edwards bring to the workshop?", options: ["(A) A payment method", "(B) Extra paint", "(C) A protective garment", "(D) Proof of reservation"], correct: 2 },
+        m2_13: { text: "What is the main purpose of the email?", options: ["(A) To attract customers to a new fitness center", "(B) To provide Ms. Nguyen with an opportunity to provide expert personal training", "(C) To celebrate Ms. Nguyen's achievements in wellness", "(D) To announce a discount available to fitness-center members"], correct: 0 },
+        m2_14: { text: "What can be inferred about Ms. Nguyen's relationship with the fitness center?", options: ["(A) She helps the fitness center to organize activities.", "(B) She has already explored the new facility.", "(C) She is a member at one of the fitness center's other locations.", "(D) She is new to using fitness centers and exercise equipment."], correct: 2 },
+        m2_15: { text: "The new fitness center is intended for use by which of the following groups of people?", options: ["(A) Expert personal trainers", "(B) Top-tier athletes", "(C) Existing fitness-center members", "(D) Community members of all fitness levels"], correct: 3 },
+        m2_16: { text: "Which of the following best states a main idea of the passage?", options: ["(A) Effective marketing strategies focus on increasing product options.", "(B) Modern consumer culture is driven by a demand for fewer products.", "(C) Individualism enhances consumer contentment.", "(D) Limiting consumer choices can lead to higher satisfaction."], correct: 3 },
+        m2_17: { text: "What is one effect of decision fatigue as mentioned in the passage?", options: ["(A) Desire to make the same choices as other consumers", "(B) Anxiety about making the wrong choice", "(C) Preference for consumer cultures", "(D) Enhanced freedom to choose"], correct: 1 },
+        m2_18: { text: "Why does the author mention Sheena Iyengar's experiment?", options: ["(A) To highlight the effectiveness of marketing strategies", "(B) To explain the methodology used in consumer psychology", "(C) To provide evidence supporting the paradox of choice", "(D) To criticize the abundance of products in modern markets"], correct: 2 },
+        m2_19: { text: "The word \"curating\" in the passage is closest in meaning to", options: ["(A) eliminating", "(B) organizing", "(C) increasing", "(D) changing"], correct: 1 },
+        m2_20: { text: "What can be inferred about consumers in collectivist cultures?", options: ["(A) They tend to report lower levels of satisfaction.", "(B) They are more affected by the paradox of choice.", "(C) They generally have fewer choices available.", "(D) They prefer individual decision-making."], correct: 2 },
+      }
+    };
+
+    const clozeAnswers = {
+      m1_1: 'ght', m1_2: 'at', m1_3: 'ple', m1_4: 'ly', m1_5: 'sic', m1_6: 'ever', m1_7: 's', m1_8: 'om', m1_9: 'ord', m1_10: 'cing',
+      m2_1: 's', m2_2: 'to', m2_3: 'ions', m2_4: 'th', m2_5: 'les', m2_6: 'ts', m2_7: 'rt', m2_8: 'lved', m2_9: 'itive', m2_10: 'ch'
+    };
+
+    // --- COMPONENTS ---
+    // Componente Cloze com Feedback Verde/Vermelho
+    const ClozeInput = ({ id, length, val, setVal, correctVal }) => {
+      const isCorrect = val && val.toLowerCase().trim() === correctVal.toLowerCase();
+      // Fica vermelho apenas se o aluno digitar o tamanho completo esperado e estiver errado
+      const isWrong = val && val.length === length && !isCorrect;
+
+      let colorClass = "border-teal-700 bg-teal-50 text-teal-900 focus:bg-teal-100";
+      if (isCorrect) {
+        colorClass = "border-green-600 bg-green-100 text-green-800 focus:bg-green-100";
+      } else if (isWrong) {
+        colorClass = "border-red-500 bg-red-100 text-red-800 focus:bg-red-100";
+      }
+
+      return (
+        <input
+          type="text"
+          maxLength={length}
+          value={val || ''}
+          onChange={(e) => setVal(id, e.target.value)}
+          className={`border-b-2 outline-none w-10 text-center font-bold mx-1 transition-colors ${colorClass}`}
+          style={{ width: `${Math.max(2, length * 0.8)}rem` }}
+        />
+      );
+    };
+
+    function App() {
+      const [screen, setScreen] = useState('intro'); 
+      const [currentModule, setCurrentModule] = useState(1);
+      const [currentIndex, setCurrentIndex] = useState(0); 
+      const [answers, setAnswers] = useState({});
+      const [timeLeft, setTimeLeft] = useState(0);
+      const [timerActive, setTimerActive] = useState(false);
+
+      useEffect(() => {
+        let interval;
+        if (timerActive && timeLeft > 0) {
+          interval = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+        } else if (timeLeft === 0 && timerActive) {
+          if (currentModule === 1) transitionToModule2();
+          else endTest();
+        }
+        return () => clearInterval(interval);
+      }, [timerActive, timeLeft]);
+
+      const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      };
+
+      const handleSetAnswer = (id, val) => {
+        setAnswers(prev => ({ ...prev, [id]: val }));
+      };
+
+      const startModule1 = () => {
+        setCurrentModule(1);
+        setCurrentIndex(0);
+        setTimeLeft(module1Data.timeLimit);
+        setScreen('module1');
+        // Relógio inicia PAUSADO aguardando o professor dar o play
+        setTimerActive(false);
+      };
+
+      const transitionToModule2 = () => {
+        setTimerActive(false);
+        setScreen('m2_intro');
+      };
+
+      const startModule2 = () => {
+        setCurrentModule(2);
+        setCurrentIndex(0);
+        setTimeLeft(module2Data.timeLimit);
+        setScreen('module2');
+        // Relógio inicia PAUSADO
+        setTimerActive(false);
+      };
+
+      const endTest = () => {
+        setTimerActive(false);
+        setScreen('results');
+      };
+
+      const restartTest = () => {
+        setScreen('intro');
+        setCurrentModule(1);
+        setCurrentIndex(0);
+        setAnswers({});
+        setTimeLeft(0);
+        setTimerActive(false);
+      };
+
+      const activeData = currentModule === 1 ? module1Data : module2Data;
+      const currentQ = activeData.questions[currentIndex];
+
+      const goNext = () => {
+        if (currentIndex < activeData.questions.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        } else {
+          setScreen(currentModule === 1 ? 'm1_review' : 'm2_review');
+        }
+      };
+
+      const goBack = () => {
+        if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
+      };
+
+      const jumpToQuestion = (idx) => {
+        setCurrentIndex(idx);
+        setScreen(`module${currentModule}`);
+      };
+
+      const calculateScore = () => {
+        let correctCount = 0;
+        let totalQuestions = 40; 
+
+        Object.keys(clozeAnswers).forEach(key => {
+          if ((answers[key] || '').toLowerCase().trim() === clozeAnswers[key].toLowerCase()) {
+            correctCount++;
+          }
+        });
+
+        [module1Data, module2Data].forEach(mod => {
+          Object.keys(mod.mcData).forEach(key => {
+            if (answers[key] === mod.mcData[key].correct) {
+              correctCount++;
+            }
+          });
+        });
+
+        return { correctCount, totalQuestions, score: Math.round((correctCount / totalQuestions) * 30) };
+      };
+
+      const renderModule1LeftPanel = () => {
+        if (currentQ.type === 'cloze') {
+          return (
+            <div className="p-8 font-serif">
+              <h3 className="text-xl font-bold mb-6 text-[#006b75]">Fill in the missing letters in the paragraph.</h3>
+              <p className="leading-loose text-lg text-gray-800">
+                We know from drawings that have been preserved in caves for over 10,000 years that early humans performed dances as a group activity. We mi
+                <ClozeInput id="m1_1" length={3} val={answers['m1_1']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_1']} /> think th
+                <ClozeInput id="m1_2" length={2} val={answers['m1_2']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_2']} /> prehistoric peo
+                <ClozeInput id="m1_3" length={3} val={answers['m1_3']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_3']} /> concentrated on
+                <ClozeInput id="m1_4" length={2} val={answers['m1_4']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_4']} />on ba
+                <ClozeInput id="m1_5" length={3} val={answers['m1_5']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_5']} />survival. How
+                <ClozeInput id="m1_6" length={4} val={answers['m1_6']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_6']} />, it i
+                <ClozeInput id="m1_7" length={1} val={answers['m1_7']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_7']} />clear fr
+                <ClozeInput id="m1_8" length={2} val={answers['m1_8']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_8']} /> the rec
+                <ClozeInput id="m1_9" length={3} val={answers['m1_9']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_9']} /> that dan
+                <ClozeInput id="m1_10" length={4} val={answers['m1_10']} setVal={handleSetAnswer} correctVal={clozeAnswers['m1_10']} /> was important to them. They recorded more drawings of dances than of any other group activity. Dances served various purposes, including ritualistic communication with the divine, storytelling, and social cohesion.
+              </p>
+            </div>
+          );
+        }
+        if (currentQ.group === 'notice') {
+          return (
+            <div className="p-8 flex justify-center items-start bg-gray-50 h-full">
+              <div className="bg-white border-2 border-gray-300 p-8 shadow-sm max-w-md w-full">
+                <h2 className="text-2xl font-bold text-center mb-6 border-b pb-4">Municipal Charter</h2>
+                <h3 className="text-lg font-bold mb-4">Sign up for paperless billing statements today.</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  Safe, convenient, easy. Enroll in paperless billing to receive monthly savings account statements in an electronic PDF document. Access your Municipal Charter account through the mobile app and select account preferences in the upper right-hand corner to enroll.
+                </p>
+              </div>
+            </div>
+          );
+        }
+        if (currentQ.group === 'social') {
+          return (
+            <div className="p-8 flex justify-center items-start bg-gray-50 h-full">
+              <div className="bg-white border-4 border-gray-300 rounded-[2rem] p-6 shadow-md max-w-md w-full relative">
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-gray-300 rounded-full"></div>
+                <div className="flex items-center mb-4 mt-4">
+                  <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center text-orange-600 font-bold mr-3">SB</div>
+                  <h2 className="text-lg font-bold">Sofia Baker</h2>
+                </div>
+                <p className="text-sm text-gray-800 mb-4 leading-relaxed">
+                  Every Saturday, our local farmer's market is the place to be! Fresh fruits, veggies, homemade goodies, and unique crafts await you. The Thompson family's organic produce is a must-try, known for its quality and cordial service. Their stall is always bustling with customers eager to buy fresh, pesticide-free vegetables from the welcoming staff.
+                </p>
+                <p className="text-sm text-gray-800 mb-4 leading-relaxed">
+                  Don't miss the bakery stall—get there early for the best bread and pastries, including gluten-free and vegan options. The smell of freshly baked goods fills the air, and these treats sell out fast!
+                </p>
+                <p className="text-sm text-gray-800 mb-6 leading-relaxed">
+                  In addition to food, the market sells handmade crafts like jewelry, pottery, and textiles. These unique items make perfect gifts and support local artisans. Plus, enjoy live music while you shop. Talented local musicians help create a vibrant atmosphere, and the community spirit makes it a delightful experience for all. See you there!
+                </p>
+                <div className="border-t pt-3 flex text-gray-500 text-sm font-bold">
+                  <span className="mr-6 cursor-pointer hover:text-blue-600">👍 Like</span>
+                  <span className="cursor-pointer hover:text-blue-600">💬 Comment</span>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        if (currentQ.group === 'academic') {
+          return (
+            <div className="p-8 font-serif bg-white h-full">
+              <h2 className="text-2xl font-bold mb-6 text-center">The Mirror Test</h2>
+              <p className="leading-loose text-[16px] text-gray-800 mb-4 indent-8">
+                Very young children cannot recognize themselves in a mirror; they usually achieve this milestone around 18 months of age. The ability to recognize oneself in the mirror is considered to be a key component of self-awareness and consciousness for humans. But what about animals?
+              </p>
+              <p className="leading-loose text-[16px] text-gray-800 mb-4 indent-8">
+                For many years, scientists have known that members of the great ape family could recognize themselves in mirrors. They measured this by the "mirror test," which involved putting a colored mark on an ape's body, and then showing the ape its reflection in a mirror. If the ape tried to remove the mark on its own body, the scientists knew that the ape was recognizing its reflection.
+              </p>
+              <p className="leading-loose text-[16px] text-gray-800 mb-4 indent-8">
+                Apes are close relatives of humans, but in recent years, scientists have discovered that other animals also pass the "mirror test." Elephants and dolphins have shown signs of self-recognition. These, like apes, are highly intelligent animals. But in a more recent experiment, a type of fish called the cleaner fish tried to scrape a mark off its body when it saw itself in the mirror. This suggests that even less intelligent animals may possess more self-awareness than previously suspected.
+              </p>
+            </div>
+          );
+        }
+      };
+
+      const renderModule2LeftPanel = () => {
+        if (currentQ.type === 'cloze') {
+          return (
+            <div className="p-8 font-serif">
+              <h3 className="text-xl font-bold mb-6 text-[#006b75]">Fill in the missing letters in the paragraph.</h3>
+              <p className="leading-loose text-lg text-gray-800">
+                The human brain is a complex organ responsible for controlling all bodily functions and enabling thought, emotion, and memory. It i
+                <ClozeInput id="m2_1" length={1} val={answers['m2_1']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_1']} /> divided in
+                <ClozeInput id="m2_2" length={2} val={answers['m2_2']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_2']} /> several reg
+                <ClozeInput id="m2_3" length={4} val={answers['m2_3']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_3']} />, each wi
+                <ClozeInput id="m2_4" length={2} val={answers['m2_4']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_4']} /> specific ro
+                <ClozeInput id="m2_5" length={3} val={answers['m2_5']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_5']} />. The cerebrum, i
+                <ClozeInput id="m2_6" length={2} val={answers['m2_6']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_6']} /> largest pa
+                <ClozeInput id="m2_7" length={2} val={answers['m2_7']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_7']} />, is invo
+                <ClozeInput id="m2_8" length={4} val={answers['m2_8']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_8']} /> in cogn
+                <ClozeInput id="m2_9" length={5} val={answers['m2_9']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_9']} /> functions su
+                <ClozeInput id="m2_10" length={2} val={answers['m2_10']} setVal={handleSetAnswer} correctVal={clozeAnswers['m2_10']} /> as reasoning, planning, and language. The cerebellum coordinates movement and balance, while the brainstem controls vital bodily functions like breathing and heart rate. Together, they enable the brain to perform its various tasks.
+              </p>
+            </div>
+          );
+        }
+        if (currentQ.group === 'email1') {
+          return (
+            <div className="p-8 flex justify-center items-start bg-gray-100 h-full">
+              <div className="bg-white border-2 border-[#006b75] p-6 shadow-md max-w-lg w-full">
+                <div className="space-y-2 mb-6 text-sm">
+                  <div className="flex"><span className="w-20 font-bold">To:</span> <span className="border px-2 w-full bg-gray-50">edward56L@dmail.com</span></div>
+                  <div className="flex"><span className="w-20 font-bold">From:</span> <span className="border px-2 w-full bg-gray-50">artforeveryone@dmail.com</span></div>
+                  <div className="flex"><span className="w-20 font-bold">Date:</span> <span className="border px-2 w-full bg-gray-50">10/09/2025</span></div>
+                  <div className="flex"><span className="w-20 font-bold">Subject:</span> <span className="border px-2 w-full bg-gray-50">Art Workshop Reservation Confirmation</span></div>
+                </div>
+                <div className="border border-gray-300 p-4 h-64 overflow-y-auto text-gray-800 text-sm">
+                  <p className="mb-4">Dear Ms. Edwards,</p>
+                  <p className="mb-4">The reservation for the art workshop that you made on September 10th has been confirmed. The workshop will take place on September 20th at 3:00 PM. All necessary arts supplies will be provided, but please bring your own apron or smock.</p>
+                  <p className="mb-4">Best regards,</p>
+                  <p>Laura Bennett</p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        if (currentQ.group === 'email2') {
+          return (
+            <div className="p-8 flex justify-center items-start bg-gray-100 h-full">
+              <div className="bg-white border-4 border-[#b56b3b] p-6 shadow-md max-w-lg w-full">
+                <div className="space-y-2 mb-6 text-sm">
+                  <div className="flex"><span className="w-20 font-bold">To:</span> <span className="border px-2 w-full bg-gray-50">nguyenbooklover@dmail.com</span></div>
+                  <div className="flex"><span className="w-20 font-bold">From:</span> <span className="border px-2 w-full bg-gray-50">part.gymworkers@dmail.com</span></div>
+                  <div className="flex"><span className="w-20 font-bold">Subject:</span> <span className="border px-2 w-full bg-gray-50">You're Invited - Bring Friends & Family to Our Grand Opening!</span></div>
+                </div>
+                <div className="border border-gray-300 p-4 h-72 overflow-y-auto text-gray-800 text-sm">
+                  <p className="mb-4">Dear Ms. Nguyen,</p>
+                  <p className="mb-4">We're excited to invite you—and your friends and family—to the grand opening of our new branch at 25 Orchid Street, happening next Monday. This event is a great opportunity to explore our state-of-the-art facility, featuring top-tier equipment, energizing group classes, and expert personal training.</p>
+                  <p className="mb-4">This celebration, exclusively for our valued members and their guests, will include guided tours, live fitness demonstrations, and complimentary refreshments. It's the perfect chance to experience our community-focused approach to wellness and introduce others to a space designed for all fitness levels.</p>
+                  <p className="mb-4">Bring your friends and family! We're offering a special one-day-only discount on memberships for all attendees.</p>
+                  <p className="mb-4">For questions or to RSVP, contact our customer service team at 555-1234.</p>
+                  <p>Warm regards,<br/>John Parker</p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        if (currentQ.group === 'academic') {
+          return (
+            <div className="p-8 font-serif bg-white h-full">
+              <h2 className="text-2xl font-bold mb-6 text-center">The Paradox of Choice</h2>
+              <p className="leading-loose text-[16px] text-gray-800 mb-4 indent-8">
+                The paradox of choice, a concept popularized by psychologist Barry Schwartz, suggests that more options can lead to less satisfaction. While the freedom to choose is fundamental to consumer culture, an overabundance of choices—from groceries to electronics—can overwhelm individuals, causing anxiety and decision fatigue. This paradox implies that the vast array of possibilities available today might actually diminish consumer contentment, as the fear of making the wrong choice looms large.
+              </p>
+              <p className="leading-loose text-[16px] text-gray-800 mb-4 indent-8">
+                Research supports this notion. In an experiment, psychologist Sheena Iyengar found that shoppers were more likely to purchase jam when offered 6 varieties instead of 24. The limited selection eased the decision process, reducing the pressure to find the 'perfect' option and making the experience more enjoyable. This phenomenon reveals that fewer choices can sometimes make consumers happier, which is a valuable insight for marketers and retailers aiming to boost satisfaction by curating their offerings.
+              </p>
+              <p className="leading-loose text-[16px] text-gray-800 mb-4 indent-8">
+                The paradox also has broader implications. In individualistic cultures, where personal choice is highly valued, the burden of decision-making can be significant. Conversely, collectivist cultures, which often provide fewer choices, report higher levels of contentment. This dynamic suggests that understanding cultural differences in consumer psychology can help businesses optimize their product strategies and enhance overall well-being.
+              </p>
+            </div>
+          );
+        }
+      };
+
+      if (screen === 'intro') {
+        return (
+          <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 font-sans text-gray-800">
+            <div className="bg-white max-w-2xl w-full rounded-xl shadow-xl overflow-hidden border border-gray-200">
+              <div className="bg-[#007b85] text-white p-6 text-center shadow-inner">
+                <h1 className="text-3xl font-bold tracking-wide">TOEFL iBT Practice Test 1</h1>
+                <p className="mt-2 text-[#b0e8ec] font-medium">Reading Section</p>
+              </div>
+              <div className="p-8">
+                <p className="mb-6 text-gray-700 leading-relaxed font-medium">
+                  In an actual test, you will answer up to 50 questions to demonstrate how well you understand academic and non-academic texts in English. There are three types of tasks.
+                </p>
+                <table className="w-full border-collapse mb-8">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border p-3 text-left">Type of Task</th>
+                      <th className="border p-3 text-left">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border p-3 font-bold text-[#007b85]">Complete the Words</td>
+                      <td className="border p-3">Fill in the missing letters in a paragraph.</td>
+                    </tr>
+                    <tr>
+                      <td className="border p-3 font-bold text-[#007b85]">Read in Daily Life</td>
+                      <td className="border p-3">Answer questions about everyday reading material.</td>
+                    </tr>
+                    <tr>
+                      <td className="border p-3 font-bold text-[#007b85]">Read an Academic Passage</td>
+                      <td className="border p-3">Answer questions about academic passages.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div className="flex justify-center mt-8">
+                  <button onClick={() => setScreen('m1_intro')} className="bg-[#007b85] hover:bg-[#005f66] text-white font-bold py-3 px-12 rounded shadow-md transition-colors">
+                    NEXT
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (screen === 'm1_intro' || screen === 'm2_intro') {
+        const isM1 = screen === 'm1_intro';
+        return (
+          <div className="min-h-screen bg-[#007b85] flex flex-col items-center justify-center p-4 font-sans text-white">
+            <h1 className="text-4xl font-bold mb-8">Reading Section, Module {isM1 ? '1' : '2'}</h1>
+            <div className="bg-white text-gray-800 max-w-xl p-8 rounded shadow-lg text-center">
+              <p className="mb-4 font-medium">In an actual test, the clock will show you how much time you have to complete Module {isM1 ? '1' : '2'}.</p>
+              <p className="mb-4 font-medium">You can use Next and Back to move to the next question or return to previous questions within the same module.</p>
+              {isM1 && <p className="mb-6 text-red-600 font-bold">In an actual test, you WILL NOT be able to return to Module 1 once you have begun Module 2.</p>}
+              <button onClick={isM1 ? startModule1 : startModule2} className="bg-[#007b85] hover:bg-[#005f66] text-white font-bold py-3 px-12 rounded shadow-md transition-colors">
+                BEGIN MODULE {isM1 ? '1' : '2'}
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      if (screen === 'm1_review' || screen === 'm2_review') {
+        const isM1 = screen === 'm1_review';
+        const activeQ = isM1 ? module1Data.questions : module2Data.questions;
+        return (
+          <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
+            <div className="bg-[#007b85] text-white flex justify-between items-center px-6 py-4 shadow-md">
+              <div className="text-lg font-bold tracking-wide">TOEFL iBT - Module {isM1 ? '1' : '2'} Review</div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center font-mono font-bold bg-white text-black px-3 py-1 rounded">
+                  <Clock size={16} className="mr-2" /> {formatTime(timeLeft)}
+                </div>
+                <button onClick={() => isM1 ? transitionToModule2() : endTest()} className="bg-white text-[#007b85] hover:bg-gray-100 px-4 py-1 text-sm font-bold rounded transition-colors">
+                  {isM1 ? 'CONTINUE TO MODULE 2' : 'FINISH TEST'}
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 max-w-4xl mx-auto w-full p-8">
+              <h2 className="text-2xl font-bold mb-6 text-[#007b85]">Review Questions</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {activeQ.map((q, idx) => {
+                  let isAnswered = false;
+                  let label = "";
+                  if (q.type === 'cloze') {
+                    isAnswered = q.qNums.every(n => (answers[`m${isM1 ? 1 : 2}_${n}`] || '').trim() !== '');
+                    label = "Questions 1-10 (Cloze)";
+                  } else {
+                    isAnswered = !!answers[q.id];
+                    label = `Question ${q.qNum}`;
+                  }
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => jumpToQuestion(idx)}
+                      className={`p-4 rounded border-2 text-left transition-colors ${isAnswered ? 'bg-white border-green-500' : 'bg-red-50 border-red-400'}`}
+                    >
+                      <div className="font-bold text-gray-800">{label}</div>
+                      <div className={`text-sm mt-1 ${isAnswered ? 'text-green-600' : 'text-red-500 font-bold'}`}>
+                        {isAnswered ? 'Answered' : 'Incomplete'}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (screen === 'results') {
+        const { correctCount, totalQuestions, score } = calculateScore();
+        return (
+          <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 font-sans">
+            <div className="bg-white max-w-2xl w-full rounded-xl shadow-xl overflow-hidden p-8 text-center border border-gray-200">
+              <h1 className="text-3xl font-bold text-[#007b85] mb-2">Test Complete</h1>
+              <p className="text-gray-600 mb-8 font-medium">Unofficial ETS Reading Score Report</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 mb-8 shadow-inner">
+                <div className="text-7xl font-bold text-[#007b85] mb-2">{score} <span className="text-4xl text-gray-400">/ 30</span></div>
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mt-4">Estimated Scaled Score</p>
+                <div className="mt-3 text-gray-700 font-mono font-medium">Raw Points: {correctCount} / {totalQuestions}</div>
+              </div>
+              <button onClick={restartTest} className="text-[#007b85] font-bold hover:underline">
+                Restart Simulation
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const mcQuestion = currentQ.type === 'mc' ? activeData.mcData[currentQ.id] : null;
+
+      return (
+        <div className="min-h-screen flex flex-col bg-white overflow-hidden font-sans" style={{ height: '100vh' }}>
+          {/* Top Bar */}
+          <div className="bg-[#007b85] text-white flex justify-between items-center px-4 py-2 shrink-0 shadow-md z-10">
+            <div className="flex items-center space-x-6">
+              <div className="text-sm font-bold uppercase tracking-wide">TOEFL iBT</div>
+              <div className="text-sm font-bold">Reading - Module {currentModule}</div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              {/* Controles do Relógio (Professor) */}
+              <div className="flex items-center bg-white rounded shadow-sm px-2 py-1">
+                <button 
+                  onClick={() => setTimerActive(!timerActive)} 
+                  className={`p-1 rounded flex items-center justify-center transition-colors ${timerActive ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}`} 
+                  title={timerActive ? "Pause Clock" : "Start Clock"}
+                >
+                  {timerActive ? <Pause size={18} /> : <Play size={18} />}
+                </button>
+                <div className="flex items-center font-mono font-bold text-black ml-2 pr-1">
+                  <Clock size={16} className="mr-1 text-gray-500" /> {formatTime(timeLeft)}
+                </div>
+              </div>
+
+              <button onClick={() => setScreen(`m${currentModule}_review`)} className="bg-white text-[#007b85] hover:bg-teal-50 px-3 py-1 text-sm font-bold rounded transition-colors flex items-center shadow-sm">
+                <List size={16} className="mr-1" /> Review
+              </button>
+
+              {/* Controles Exclusivos de Navegação do Professor */}
+              <div className="flex items-center bg-yellow-300 p-1 rounded shadow-sm border border-yellow-500 ml-4">
+                <button onClick={goBack} disabled={currentIndex === 0} className={`bg-white text-gray-800 px-3 py-1 text-sm font-bold rounded-l flex items-center border-r border-gray-300 transition-colors ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}>
+                  <ChevronLeft size={16} className="mr-1" /> Back
+                </button>
+                <button onClick={goNext} className="bg-white text-gray-800 hover:bg-gray-100 px-3 py-1 text-sm font-bold rounded-r flex items-center transition-colors">
+                  Next <ChevronRight size={16} className="ml-1" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Split Content */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Left Side */}
+            <div className="w-1/2 border-r-4 border-gray-200 overflow-y-auto bg-white">
+              {currentModule === 1 ? renderModule1LeftPanel() : renderModule2LeftPanel()}
+            </div>
+
+            {/* Right Side */}
+            <div className="w-1/2 bg-[#f4f6f8] p-8 overflow-y-auto flex flex-col relative">
+              {currentQ.type === 'cloze' ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 max-w-sm">
+                    <CheckCircle size={48} className="mx-auto text-[#007b85] mb-4" />
+                    <h3 className="text-xl font-bold mb-2">Complete the Words</h3>
+                    <p className="text-gray-600 mb-6">Read the text on the left and fill in the missing letters in the blank spaces directly within the paragraph.</p>
+                    <p className="text-sm font-bold text-yellow-600">Please wait for the teacher to continue.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="max-w-xl">
+                  <div className="font-bold text-sm text-gray-500 uppercase tracking-widest mb-2">Question {currentQ.qNum}</div>
+                  <div className="font-bold text-[18px] text-gray-900 mb-6 leading-relaxed">
+                    {mcQuestion.text}
+                  </div>
+                  <div className="space-y-3">
+                    {mcQuestion.options.map((option, idx) => {
+                      const isSelected = answers[currentQ.id] === idx;
+                      const isCorrect = idx === mcQuestion.correct;
+                      
+                      // Lógica do feedback visual (Verde/Vermelho)
+                      const showGreen = isSelected && isCorrect;
+                      const showRed = isSelected && !isCorrect;
+                      const isAnswered = answers[currentQ.id] !== undefined;
+                      const highlightCorrect = isAnswered && !isSelected && isCorrect; // Destaca sutilmente a certa se errar
+
+                      let containerClass = "bg-white border-gray-300 hover:border-teal-400";
+                      let textClass = "text-gray-800 font-medium";
+
+                      if (showGreen) {
+                        containerClass = "bg-green-100 border-green-500 shadow-sm";
+                        textClass = "text-green-800 font-bold";
+                      } else if (showRed) {
+                        containerClass = "bg-red-100 border-red-500 shadow-sm";
+                        textClass = "text-red-800 font-bold";
+                      } else if (highlightCorrect) {
+                        containerClass = "bg-green-50 border-green-400 border-dashed";
+                        textClass = "text-green-700 font-bold";
+                      }
+
+                      return (
+                        <label key={idx} className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${containerClass}`}>
+                          <input 
+                            type="radio" 
+                            name={currentQ.id}
+                            checked={isSelected}
+                            onChange={() => handleSetAnswer(currentQ.id, idx)}
+                            className="mt-1 w-4 h-4 text-[#007b85] border-gray-300 focus:ring-[#007b85]"
+                          />
+                          <span className={`ml-3 text-[15px] leading-snug ${textClass}`}>
+                            {option}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
